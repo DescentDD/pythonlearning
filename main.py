@@ -36,3 +36,30 @@ print('*')
 print('*',end='')
 print('*')
 """
+#day4
+"""
+def foo():
+    print('hello, world!')
+def foo():
+    print('goodbye, world!')
+foo()
+import module1 as m1
+import module2 as m2
+
+m1.foo()
+m2.foo()
+from module1 import foo
+"""
+"""
+def foo():
+    global a
+    a = 200
+    print(a)  # 200
+
+
+if __name__ == '__main__':
+    a = 100
+    foo()
+    print(a)  # 200
+    #global覆盖
+    """
