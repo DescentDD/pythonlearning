@@ -140,26 +140,22 @@ def main():
 
 if __name__ == "__main__":
     main()
-"""
+
 from time import sleep
 
 
 class Clock(object):
-    """æ°å­æ¶é"""
+
 
     def __init__(self, hour=0, minute=0, second=0):
-        """åå§åæ¹æ³
-
-        :param hour: æ¶
-        :param minute: å
-        :param second: ç§
-        """
+  
+        
         self._hour = hour
         self._minute = minute
         self._second = second
 
     def run(self):
-        """èµ°å­"""
+      
         self._second += 1
         if self._second == 60:
             self._second = 0
@@ -171,8 +167,8 @@ class Clock(object):
                     self._hour = 0
 
     def show(self):
-        """æ¾ç¤ºæ¶é´"""
-        return '%02d:%02d:%02d' % \
+        
+        return '%02d:%02d:%02d' % 
                (self._hour, self._minute, self._second)
 
 
@@ -186,3 +182,43 @@ def main():
 
 if __name__ == '__main__':
     main()
+"""
+#day9
+"""
+class Person(object):
+
+    def __init__(self, name, age):
+        self._name = name
+        self._age = age
+
+
+    @property
+    def name(self):
+        return self._name
+    @property
+    def age(self):
+        return self._age
+
+
+    @age.setter
+    def age(self, age):
+        self._age = age
+
+    def play(self):
+        if self._age <= 16:
+            print('%sqwjd' % self._name)
+        else:
+            print('%sqwer' % self._name)
+
+
+def main():
+    person = Person('0086', 12)
+    person.play()
+    print(person.name)
+    person.age = 22
+    person.play()
+
+
+if __name__ == '__main__':
+    main()
+"""
