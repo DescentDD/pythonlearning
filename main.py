@@ -187,25 +187,26 @@ if __name__ == '__main__':
 """
 class Person(object):
 
-    def __init__(self, name, age):
+    __slots__ = ('_name','_agew','_gender','fuck')
+    def __init__(self, name, agee):
         self._name = name
-        self._age = age
+        self._agew = agee
 
 
     @property
     def name(self):
         return self._name
     @property
-    def age(self):
-        return self._age
+    def ageo(self):
+        return self._agew
 
 
-    @age.setter
-    def age(self, age):
-        self._age = age
+    @ageo.setter
+    def ages(self, fuck):
+        self._agew = fuck
 
     def play(self):
-        if self._age <= 16:
+        if self._agew <= 16:
             print('%sqwjd' % self._name)
         else:
             print('%sqwer' % self._name)
@@ -214,11 +215,22 @@ class Person(object):
 def main():
     person = Person('0086', 12)
     person.play()
+    person._gender='male'
+    person.fuck='lll'
     print(person.name)
-    person.age = 22
+    print(person._agew)
+    print(person._gender)
+    print(person.fuck)
+    person.ages = 22
     person.play()
 
 
 if __name__ == '__main__':
     main()
+
+
+from time import localtime,time
+ctime=localtime()
+print(ctime.tm_hour)
 """
+#day10,fight1.15.py
