@@ -33,7 +33,7 @@ class DescentDD(fighter):
         self._mp=mp
     def attack(self,other):
         a=['打你脸','打你肚子','踹你下面','扇你耳光']
-        print(a[randint(0,4)])
+        print(a[randint(0,3)])
         other.hp-=randint(10000000,11456789)
     def superattack(self,other):
         if self.mp>=50:
@@ -43,6 +43,8 @@ class DescentDD(fighter):
             return True
         else:
             print('傻逼你没蓝啦')
+            print('那只能平A了')
+            self.attack(other)
             return False
     def __str__(self):
         return "%s的血量:%s\n蓝条:%s"%(self.name,self.hp,self.mp)
