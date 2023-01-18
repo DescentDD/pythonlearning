@@ -235,3 +235,163 @@ print(ctime.tm_hour)
 """
 #day10,fight1.15.py
 #day11,card.py
+"""
+import tkinter
+import tkinter.messagebox
+
+
+def main():
+    flag = True
+
+    # ä¿®æ¹æ ç­¾ä¸çæå­
+    def change_label_text():
+        nonlocal flag
+        flag = not flag
+        color, msg = ('red', 'Hello, world!')\
+            if flag else ('blue', 'Goodbye, world!')
+        label.config(text=msg, fg=color)
+
+    # ç¡®è®¤éåº
+    def confirm_to_quit():
+        if tkinter.messagebox.askokcancel('æ¸©é¦¨æç¤º', 'ç¡®å®è¦éåºå?'):
+            top.quit()
+
+    # åå»ºé¡¶å±çªå£
+    top = tkinter.Tk()
+    # è®¾ç½®çªå£å¤§å°
+    top.geometry('240x160')
+    # è®¾ç½®çªå£æ é¢
+    top.title('å°æ¸¸æ')
+    # åå»ºæ ç­¾å¯¹è±¡å¹¶æ·»å å°é¡¶å±çªå£
+    label = tkinter.Label(top, text='Hello, world!', font='Arial -32', fg='red')
+    label.pack(expand=1)
+    # åå»ºä¸ä¸ªè£æé®çå®¹å¨
+    panel = tkinter.Frame(top)
+    # åå»ºæé®å¯¹è±¡ æå®æ·»å å°åªä¸ªå®¹å¨ä¸­ éè¿commandåæ°ç»å®äºä»¶åè°å½æ°
+    button1 = tkinter.Button(panel, text='ä¿®æ¹', command=change_label_text)
+    button1.pack(side='left')
+    button2 = tkinter.Button(panel, text='éåº', command=confirm_to_quit)
+    button2.pack(side='right')
+    panel.pack(side='bottom')
+    # å¼å¯ä¸»äºä»¶å¾ªç¯
+    tkinter.mainloop()
+
+
+if __name__ == '__main__':
+    main()
+"""
+#day12
+"""
+from enum import Enum, unique
+from math import sqrt
+from random import randint
+
+import pygame
+
+
+@unique
+class Color(Enum):
+
+
+    RED = (255, 0, 0)
+    GREEN = (0, 255, 0)
+    BLUE = (0, 0, 255)
+    BLACK = (0, 0, 0)
+    WHITE = (255, 255, 255)
+    GRAY = (242, 242, 242)
+
+    @staticmethod
+    def random_color():
+
+        r = randint(0, 255)
+        g = randint(0, 255)
+        b = randint(0, 255)
+        return (r, g, b)
+
+
+class Ball(object):
+
+
+    def __init__(self, x, y, radius, sx, sy, color=Color.RED):
+
+        self.x = x
+        self.y = y
+        self.radius = radius
+        self.sx = sx
+        self.sy = sy
+        self.color = color
+        self.alive = True
+
+    def move(self, screen):
+
+        self.x += self.sx
+        self.y += self.sy
+        if self.x - self.radius <= 0 or \
+                self.x + self.radius >= screen.get_width():
+            self.sx = -self.sx
+        if self.y - self.radius <= 0 or \
+                self.y + self.radius >= screen.get_height():
+            self.sy = -self.sy
+
+    def eat(self, other):
+
+        if self.alive and other.alive and self != other:
+            dx, dy = self.x - other.x, self.y - other.y
+            distance = sqrt(dx ** 2 + dy ** 2)
+            if distance < self.radius + other.radius \
+                    and self.radius > other.radius:
+                other.alive = False
+                self.radius = self.radius + int(other.radius * 0.146)
+
+    def draw(self, screen):
+
+        pygame.draw.circle(screen, self.color,
+                           (self.x, self.y), self.radius, 0)
+def main():
+    # å®ä¹ç¨æ¥è£ææççå®¹å¨
+    balls = []
+    # åå§åå¯¼å¥çpygameä¸­çæ¨¡å
+    pygame.init()
+    # åå§åç¨äºæ¾ç¤ºççªå£å¹¶è®¾ç½®çªå£å°ºå¯¸
+    screen = pygame.display.set_mode((800, 600))
+    # è®¾ç½®å½åçªå£çæ é¢
+    pygame.display.set_caption('å¤§çåå°ç')
+    running = True
+    # å¼å¯ä¸ä¸ªäºä»¶å¾ªç¯å¤çåççäºä»¶
+    while running:
+        # ä»æ¶æ¯éåä¸­è·åäºä»¶å¹¶å¯¹äºä»¶è¿è¡å¤ç
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            # å¤çé¼ æ äºä»¶çä»£ç 
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                # è·å¾ç¹å»é¼ æ çä½ç½®
+                x, y = event.pos
+                radius = randint(10, 100)
+                sx, sy = randint(-10, 10), randint(-10, 10)
+                color = Color.random_color()
+                # å¨ç¹å»é¼ æ çä½ç½®åå»ºä¸ä¸ªç(å¤§å°ãéåº¦åé¢è²éæº)
+                ball = Ball(x, y, radius, sx, sy, color)
+                # å°çæ·»å å°åè¡¨å®¹å¨ä¸­
+                balls.append(ball)
+        screen.fill((255, 255, 255))
+        # ååºå®¹å¨ä¸­çç å¦ææ²¡è¢«åæå°±ç»å¶ è¢«åæäºå°±ç§»é¤
+        for ball in balls:
+            if ball.alive:
+                ball.draw(screen)
+            else:
+                balls.remove(ball)
+        pygame.display.flip()
+        # æ¯é50æ¯«ç§å°±æ¹åççä½ç½®åå·æ°çªå£
+        pygame.time.delay(50)
+        for ball in balls:
+            ball.move(screen)
+            # æ£æ¥çææ²¡æåå°å¶ä»çç
+            for other in balls:
+                ball.eat(other)
+
+
+if __name__ == '__main__':
+    main()
+"""
+#day13

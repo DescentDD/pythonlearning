@@ -53,16 +53,14 @@ class player(object):
     @property
     def currentCards(self):
         return self._currentCards
-    def arrange(self,card_key):
-        self._currentCards.sort(key=card_key)
-def get_key(card):
-    return (card.suite,card.face)
 def main():
     p=poker()
     p.wash()
-    wdd=player('DescentDD')
+    u=[player('DescentDD'),player('A'),player('B'),player('C')]
     for _ in range(13):
-        wdd.get(p.next)
-    wdd.arrange(get_key)
-    print(wdd.currentCards)
+        for i in u:
+            i.get(p.next)
+    for i in u:
+        print(i.name+':',end='')
+        print(i.currentCards)
 main()
