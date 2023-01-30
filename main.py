@@ -395,3 +395,247 @@ if __name__ == '__main__':
     main()
 """
 #day13
+"""
+éªè¯è¾å¥ç¨æ·ååQQå·æ¯å¦ææå¹¶ç»åºå¯¹åºçæç¤ºä¿¡æ¯
+
+è¦æ±ï¼ç¨æ·åå¿é¡»ç±å­æ¯ãæ°å­æä¸åçº¿ææä¸é¿åº¦å¨6~20ä¸ªå­ç¬¦ä¹é´ï¼QQå·æ¯5~12çæ°å­ä¸é¦ä½ä¸è½ä¸º0
+"""
+"""
+import re
+
+    匹配用户名r’开头^0-9或者a-z或者A-Z或者下划线6到20位结尾$
+    m1 = re.match(r'^[0-9a-zA-Z_]{6,20}$', username)
+    匹配qq号：r‘1到9开头，数字4-11位’
+    m2 = re.match(r'^[1-9]\d{4,11}$', qq)
+
+    sentence = '你丫是傻叉吗? 我操你大爷的. Fuck you.'
+    purified = re.sub('[操肏艹]|fuck|shit|傻[比屄逼叉缺吊屌]|煞笔',
+                      '*', sentence, flags=re.IGNORECASE)
+    print(purified)  # 你丫是*吗? 我*你大爷的. * you.
+    
+        poem = '窗前明月光，疑是地上霜。举头望明月，低头思故乡。'
+    sentence_list = re.split(r'[，。, .]', poem)
+    while '' in sentence_list:
+        sentence_list.remove('')
+    print(sentence_list)  # ['窗前明月光', '疑是地上霜', '举头望明月', '低头思故乡']
+"""
+#day14
+"""
+from multiprocessing import Process
+from os import getpid
+from random import randint
+from time import time, sleep
+
+
+def download_task(filename):
+    print('启动下载进程，进程号[%d].' % getpid())
+    print('开始下载%s...' % filename)
+    time_to_download = randint(5, 10)
+    sleep(time_to_download)
+    print('%s下载完成! 耗费了%d秒' % (filename, time_to_download))
+
+
+def main():
+    start = time()
+    p1 = Process(target=download_task, args=('Python从入门到住院.pdf', ))
+    p1.start()
+    p2 = Process(target=download_task, args=('Peking Hot.avi', ))
+    p2.start()
+    p1.join()
+    p2.join()
+    end = time()
+    print('总共耗费了%.2f秒.' % (end - start))
+
+
+if __name__ == '__main__':
+    main()
+
+from time import sleep
+from threading import Thread, Lock
+
+
+class Account(object):
+
+    def __init__(self):
+        self._balance = 0
+        self._lock = Lock()
+
+    def deposit(self, money):
+        # 先获取锁才能执行后续的代码
+        self._lock.acquire()
+
+        new_balance = self._balance + money
+        sleep(0.01)
+        self._balance = new_balance
+
+        # 在finally中执行释放锁的操作保证正常异常锁都能释放
+        self._lock.release()
+
+    @property
+    def balance(self):
+        return self._balance
+
+
+class AddMoneyThread(Thread):
+
+    def __init__(self, account, money):
+        super().__init__()
+        self._account = account
+        self._money = money
+
+    def run(self):
+        self._account.deposit(self._money)
+
+
+def main():
+    account = Account()
+    threads = []
+    for _ in range(100):
+        t = AddMoneyThread(account, 1)
+        threads.append(t)
+        t.start()
+    for t in threads:
+        t.join()
+    print('账户余额为: ￥%d元' % account.balance)
+
+
+if __name__ == '__main__':
+    main()
+"""
+"""
+import time
+import tkinter
+import tkinter.messagebox
+from threading import Thread
+
+
+def main():
+
+    class DownloadTaskHandler(Thread):
+
+        def run(self):
+            time.sleep(10)
+            tkinter.messagebox.showinfo('提示', '下载完成!')
+            # 启用下载按钮
+            button1.config(state=tkinter.NORMAL)
+
+    def download():
+        # 禁用下载按钮
+        button1.config(state=tkinter.DISABLED)
+        # 通过daemon参数将线程设置为守护线程(主程序退出就不再保留执行)
+        # 在线程中处理耗时间的下载任务
+        DownloadTaskHandler(daemon=True).start()
+
+    def show_about():
+        tkinter.messagebox.showinfo('关于', '作者: 骆昊(v1.0)')
+
+    top = tkinter.Tk()
+    top.title('单线程')
+    top.geometry('200x150')
+    top.wm_attributes('-topmost', 1)
+
+    panel = tkinter.Frame(top)
+    button1 = tkinter.Button(panel, text='下载', command=download)
+    button1.pack(side='left')
+    button2 = tkinter.Button(panel, text='关于', command=show_about)
+    button2.pack(side='right')
+    panel.pack(side='bottom')
+
+    tkinter.mainloop()
+
+
+if __name__ == '__main__':
+    main()
+
+from multiprocessing import Process, Queue
+from random import randint
+from time import time
+
+
+def task_handler(curr_list, result_queue):
+    total = 0
+    for number in curr_list:
+        total += number
+    result_queue.put(total)
+
+
+def main():
+    processes = []
+    number_list = [x for x in range(1, 100000001)]
+    result_queue = Queue()
+    index = 0
+    # 启动8个进程将数据切片后进行运算
+    for _ in range(8):
+        p = Process(target=task_handler,
+                    args=(number_list[index:index + 12500000], result_queue))
+        index += 12500000
+        processes.append(p)
+        p.start()
+    # 开始记录所有进程执行完成花费的时间
+    start = time()
+    for p in processes:
+        p.join()
+    # 合并执行结果
+    total = 0
+    while not result_queue.empty():
+        total += result_queue.get()
+    print(total)
+    end = time()
+    print('Execution time: ', (end - start), 's', sep='')
+    
+
+
+if __name__ == '__main__':
+    main()
+"""
+#day18
+from time import time
+from threading import Thread
+
+import requests
+
+
+# 继承Thread类创建自定义的线程类
+"""
+class DownloadHanlder(Thread):
+
+    def __init__(self, url):
+        super().__init__()
+        self.url = url
+
+    def run(self):
+        filename = self.url[self.url.rfind('/') + 1:]
+        resp = requests.get(self.url)
+        with open('/Users/Hao/' + filename, 'wb') as f:
+            f.write(resp.content)
+
+
+def main():
+    # 通过requests模块的get函数获取网络资源
+    # 下面的代码中使用了天行数据接口提供的网络API
+    # 要使用该数据接口需要在天行数据的网站上注册
+    # 然后用自己的Key替换掉下面代码的中APIKey即可
+    resp = requests.get(
+        'http://api.tianapi.com/meinv/?key=APIKey&num=10')
+    # 将服务器返回的JSON格式的数据解析为字典
+    data_model = resp.json()
+    for mm_dict in data_model['newslist']:
+        url = mm_dict['picUrl']
+        # 通过多线程的方式实现图片下载
+        DownloadHanlder(url).start()
+
+
+if __name__ == '__main__':
+    main()
+
+s1 = r'\'hello, world!\''
+s2 = r'\n\\hello, world!\\\n'
+print(s1, s2, end='')
+
+a, b = 5, 10
+print(f'{a} * {b} = {a * b}')
+
+file=open("123.txt",mode="a")
+file.write("我是你爹")
+file.close()
+"""
